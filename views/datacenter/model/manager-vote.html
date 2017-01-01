@@ -1,0 +1,43 @@
+<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">经理点赞率 Top10</h2>
+    </div>
+    <table class="manager-vote mdl-data-table mdl-js-data-table mdl-card__supporting-text">
+        <thead>
+        <tr>
+            <!--<th class="mdl-data-table__cell&#45;&#45;non-numeric">门店</th>-->
+            <th class="mdl-data-table__cell--non-numeric">门店编号</th>
+            <th class="mdl-data-table__cell--non-numeric">姓名</th>
+            <th>点赞率</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<script>
+    (function () {
+        var $tbody = $('.manager-vote tbody');
+        var item = '<tr class="cursor"><td class="mdl-data-table__cell--non-numeric"></td><td class="mdl-data-table__cell--non-numeric"></td><td></td></tr>';
+        window.ManagerVote = function (list) {
+            $tbody.empty();
+            var i, manager;
+            for (i in list) {
+                var $item = $(item);
+                manager = list[i];
+                $item.attr('data-store-id', manager.StoreId);
+                $item
+                        .find('td:eq(0)')
+                        .text(manager.store.number)
+                        .end()
+                        .find('td:eq(1)')
+                        .text(manager.name)
+                        .end()
+                        .find('td:eq(2)')
+                        .text(manager.votePercent)
+                        .end();
+                $tbody.append($item);
+            }
+        };
+    })();
+</script>

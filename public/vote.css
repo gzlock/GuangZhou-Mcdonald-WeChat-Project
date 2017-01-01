@@ -1,0 +1,245 @@
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    resize: none;
+    text-decoration: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+html, body {
+    height: 100%;
+}
+
+.bg {
+    background: url("/public/bg.jpg") center center;
+}
+
+div > * {
+    vertical-align: middle;
+}
+
+.center {
+    text-align: center;
+}
+
+.red {
+    color: red;
+}
+
+.relative {
+    position: relative;
+}
+
+.blue {
+    color: blue;
+}
+
+.header img {
+    height: 50px;
+}
+
+.index-logo {
+    position: relative;
+    padding: 10px 0;
+}
+
+.index-logo img {
+    max-width: 50%;
+}
+
+.index-people img {
+    max-width: 60%;
+}
+
+.index-tip {
+    padding: 20px 40px;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.index-tip img {
+    height: 12px;
+}
+
+.click-animation .float {
+    position: relative;
+    text-align: center;
+}
+
+.click-animation .button {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.index-page .click-animation .float img {
+    width: 40px;
+    height: 40px;
+}
+
+.index-page .click-animation .button img {
+    width: 40px;
+}
+
+.vote-logo {
+    margin: 20px 0 0;
+}
+
+.vote-logo img {
+    max-width: 60%;
+}
+
+.vote {
+    padding: 0 20px;
+}
+
+.vote .vote-item {
+    margin-top: 20px;
+}
+
+.vote-item .vote-item-title {
+    margin: 40px 0 10px;
+}
+
+.vote-item .vote-item-content {
+    margin-top: 20px;
+}
+
+.vote-item-score .right {
+    position: absolute;
+    right: 0;
+}
+
+.vote .click-animation {
+    height: 80px;
+}
+
+.vote-item-score-tip {
+    position: relative;
+    border-bottom: solid 2px #666;
+    padding: 0 0 10px 0;
+    margin-bottom: 10px;
+}
+
+.vote-item-score-thumb {
+    width: 100%;
+}
+
+.vote-item-score-thumb img {
+    width: 40px;
+}
+
+.vote-item-score-thumb img:nth-child(1) {
+    display: inline;
+}
+
+.vote-item-score-thumb img:nth-child(2) {
+    display: none;
+}
+
+.vote-item-score-thumb .checked img:nth-child(1) {
+    display: none;
+}
+
+.vote-item-score-thumb .checked img:nth-child(2) {
+    display: inline;
+}
+
+.vote-check .vote-checkbox {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+}
+
+.vote-check .vote-checkbox img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+}
+
+.vote-checkbox img:nth-child(1) {
+    display: block;
+}
+
+.vote-checkbox img:nth-child(2) {
+    display: none;
+}
+
+.vote-check .checked .vote-checkbox img:nth-child(1) {
+    display: none;
+}
+
+.vote-check .checked .vote-checkbox img:nth-child(2) {
+    display: block;
+}
+
+.vote-page .click-animation {
+    height: 40px;
+    width: 100%;
+}
+
+.vote-page .float img {
+    width: 30px;
+}
+
+.vote-area-item {
+    margin-top: 5px;
+}
+
+.vote-area-item > div {
+    display: inline-block;
+}
+
+.vote-area-image {
+    height: 40px;
+}
+
+.vote-area-name {
+    margin: 0 10px;
+}
+
+.vote-area-item .vote-area-name {
+    width: 130px;
+}
+
+.last-page .abc {
+    height: 40px;
+}
+
+.last-page .float img {
+    width: 30px;
+}
+
+.last-page .button {
+    margin-top: 10px;
+}
+
+.last-page .button img {
+    width: 40px;
+}
+
+.last-page span {
+    padding: 0 0 0 10px;
+}
+
+.last-vote {
+    margin-top: 5px;
+}
+
+.last-page .vote-item-title {
+    margin-top: 10px;
+}
+
+.last-page textarea {
+    width: 100%;
+    height: 80px;
+    border: solid 2px #00a6cd;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.last-vote {
+    font-size: 14px;
+}

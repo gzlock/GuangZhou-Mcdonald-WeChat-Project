@@ -1,0 +1,102 @@
+<div class="users mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">数据中心账号管理</h2>
+    </div>
+    <table class="mdl-card__supporting-text mdl-data-table mdl-js-data-table">
+        <thead>
+        <tr>
+            <th class="mdl-data-table__cell--non-numeric">账号</th>
+            <th class="mdl-data-table__cell--non-numeric">密码</th>
+            <th class="mdl-data-table__cell--non-numeric">确认</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="add-user">
+            <td class="mdl-data-table__cell--non-numeric"><input class="username" placeholder="新的账号"></td>
+            <td class="mdl-data-table__cell--non-numeric"><input class="password" placeholder="新的密码"></td>
+            <td>
+                <button disabled class="add mdl-button mdl-js-button mdl-button--icon mdl-button--colored"><i
+                        class="material-icons">add</i>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    $(function () {
+        var $addUser = $('.add-user');
+        var $item = $('<tr>\
+                <td><input class="username"></td>\
+                <td><input class="password"></td>\
+                <td>\
+                <button disabled class="edit mdl-button mdl-js-button mdl-button--icon mdl-button--colored"><i class="material-icons">done</i></button>\
+                <button class="delete mdl-button mdl-js-button mdl-button--icon mdl-button--colored"><i class="material-icons">delete_forever</i></button>\
+                </td>\
+                </tr>');
+
+        $('.users')
+                .on('input propertychange', 'input', function () {
+                    var $this = $(this), $tr = $this.closest('tr'), $button = $tr.find('button');
+                    $button.removeAttr('disabled');
+                })
+                .on('click', 'button.add', function () {
+                    var $this = $(this), $tr = $this.closest('tr');
+                    $.post('user/add', {
+                        username: $tr.find('input:eq(0)').val(),
+                        password: $tr.find('input:eq(1)').val()
+                    }, function (data) {
+                        if (data.error)
+                            return Toast(data.error);
+                        Toast('成功添加用户');
+                        $tr.find('input').val('');
+                        $this.attr('disabled', 'disabled');
+                        DataUser_Show(data.success);
+                    });
+                })
+                .on('click', 'button.delete', function () {
+                    var $this = $(this), $tr = $this.closest('tr'), id = $this.attr('user-id');
+                    if (!window.confirm('确认删除:\n' + $tr.find('input:eq(0)').val()))
+                        return;
+                    $.get('user/delete/' + id, function (data) {
+                        if (data.error)
+                            return Toast(data.error);
+                        Toast(data.success);
+                        $tr.remove();
+                    });
+                })
+                .on('click', 'button.edit', function () {
+                    var $this = $(this), $tr = $this.closest('tr'), id = $this.attr('user-id');
+                    $this.attr('disabled', 'disabled');
+                    $.post('user/edit', {
+                        id: id,
+                        username: $tr.find('input:eq(0)').val(),
+                        password: $tr.find('input:eq(1)').val()
+                    }, function (data) {
+                        Toast(data.success || data.error);
+                        if (data.error)
+                            $this.removeAttr('disabled');
+                    });
+                });
+
+        function DataUser_Show(user) {
+            var $new = $item.clone();
+            $new.find('.username').val(user.username);
+            $new.find('.password').val(user.password);
+            $new.find('button').attr('user-id', user.id);
+            $addUser.after($new);
+        }
+
+        function LoadUser() {
+            $addUser.siblings().remove();
+            $.get('users', function (data) {
+                data = data.success;
+                for (var i in data) {
+                    DataUser_Show(data[i]);
+                }
+            })
+        }
+
+        LoadUser();
+    });
+</script>

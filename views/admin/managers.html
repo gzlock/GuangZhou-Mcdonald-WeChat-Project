@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../viewport %>
+    <% include ../mdl %>
+    <script></script>
+    <title>经理管理</title>
+    <style>
+        body {
+            padding: 10px;
+        }
+
+        .flow {
+            margin-bottom: 10px;
+        }
+
+        .flow * {
+            color: white !important;
+            vertical-align: middle;
+        }
+
+        .cards {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .cards > .mdl-card {
+            margin-right: 10px;
+            width: auto;
+        }
+
+        table.mdl-card__supporting-text {
+            width: 100%;
+        }
+
+        input {
+            padding: 3px;
+        }
+    </style>
+</head>
+<body>
+<% include ../toast %>
+<% include model/window.html %>
+<div class="flow">
+    <a href="/admin/"
+       class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <i class="material-icons">chevron_left</i> 返回管理后台
+    </a>
+</div>
+<div class="cards">
+    <div class="stores mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+            <div class="mdl-card__title__text">门店</div>
+        </div>
+        <table class="mdl-card__supporting-text mdl-card__supporting-text mdl-data-table mdl-data-table--selectable">
+            <thead>
+            <tr>
+                <td class="mdl-data-table__cell--non-numeric">门店名称</td>
+                <td class="mdl-data-table__cell--non-numeric">搜索<input id="search-store" placeholder="店名,四位编号,七位编号"/>
+                </td>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="mdl-card__menu">
+            <button class="load-stores mdl-button mdl-js-button mdl-button--icon mdl-button--colored">
+                <i class="material-icons">autorenew</i>
+            </button>
+        </div>
+    </div>
+    <div class="managers mdl-card mdl-shadow--2dp" style="display: none;">
+        <div class="mdl-card__title">
+            <div class="mdl-card__title__text">经理</div>
+        </div>
+        <table class="mdl-card__supporting-text mdl-data-table mdl-data-table--selectable">
+            <thead>
+            <tr>
+                <td class="mdl-data-table__cell--non-numeric">姓名</td>
+                <td class="mdl-data-table__cell--non-numeric">工作起始时间</td>
+                <td class="mdl-data-table__cell--non-numeric">工作结束时间</td>
+                <td class="mdl-data-table__cell--non-numeric"></td>
+            </tr>
+            <tr class="add-manager-work-time">
+                <td class="mdl-data-table__cell--non-numeric">
+                    <span class="manager-name" style="display: none;">
+                        经理名字
+                    </span>
+                    <button class="manager-select mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                        <i class="material-icons">account_box</i>选择经理
+                    </button>
+                    <input name="ManagerId" type="hidden">
+                    <input name="StoreId" type="hidden">
+                </td>
+                <td><input class="date" name="start"/></td>
+                <td><input class="date" name="end"/></td>
+                <td>
+                    <button class="manager-submit mdl-button mdl-js-button mdl-button--icon mdl-button--colored">
+                        <i class="material-icons">done</i>
+                    </button>
+                    <button class="manager-cancel mdl-button mdl-js-button mdl-button--icon mdl-button--accent">
+                        <i class="material-icons">close</i>
+                    </button>
+                </td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="work-future">
+                <td colspan="4" class="red">未生效</td>
+            </tr>
+            <tr class="work-current">
+                <td colspan="4">正在生效</td>
+            </tr>
+            <tr class="work-expired">
+                <td colspan="4">已过期</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    var storeSearchDuration = 1000, managersSearchDuration = 1000, formatTimeDuration = 1000;
+    var selectManager = '<tr><td colspan="2" class="mdl-data-table__cell--non-numeric">\
+                <input class="window-search-manager" placeholder="经理名字">\
+                <button class="manager-add mdl-button mdl-js-button mdl-button--primary">添加</button>\
+                </td></tr>\
+                <tr><td class="mdl-data-table__cell--non-numeric">经理</td><td class="mdl-data-table__cell--non-numeric">当前</td></tr>';
+    var emptyItem = '<tr><td colspan="10" class="mdl-data-table__cell--non-numeric center">没有数据</td></tr>';
+    var selectItem = '<tr class="cursor"><td class="mdl-data-table__cell--non-numeric"></td><td class="mdl-data-table__cell--non-numeric"></td></tr>';
+    var storesItem = '<tr class="cursor" ><td class="mdl-data-table__cell--non-numeric"></td><td></td></tr>';
+    var managerItem = '<tr>\
+                        <td class="mdl-data-table__cell--non-numeric"></td>\
+                        <td><input name="start" class="date" /></td><td><input name="end" class="date" /></td><td>\
+                        <button class="edit-work mdl-button mdl-js-button mdl-button--icon mdl-button--colored">\
+                        <i class="material-icons">done</i></button>\
+                        <button class="delete-work mdl-button mdl-js-button mdl-button--icon mdl-button--accent">\
+                        <i class="material-icons">delete</i></button>\
+                        </td></tr>';
+</script>
+<script>
+    $(function () {
+
+        var $StoresList = $('.stores tbody');
+
+        SearchStore($StoresList);
+
+        $StoresList.on('click', 'tr[data-id]', function () {
+            var $this = $(this), id = $this.attr('data-id');
+            $this.toggleClass('is-selected').siblings().removeClass('is-selected');
+            LoadWorkTime(id);
+            $('.managers').show();
+            $('.add-manager-work-time input[name="StoreId"]').val(id);
+            ResetWorkTime();
+        });
+
+
+        $('.load-stores').click(LoadStore).trigger('click');
+
+        $('body').on('keyup', 'input.date', function (e) {
+            if (e.which == 8)
+                $(this).val('');
+        });
+
+        function LoadStore() {
+            $StoresList.empty();
+            $.get('stores', function (data) {
+                if (data.error)
+                    return Toast(data.error);
+                for (var i in data.success) {
+                    var $item = $(storesItem), store = data.success[i];
+                    $item
+                            .attr('data-id', store.id)
+                            .attr('data-number', store.number)
+                            .attr('data-number1', store.number1)
+                            .find('td:eq(0)').text(store.name)
+                            .end()
+                            .find('td:eq(1)')
+                            .html(store.number + '<br>' + store.number1);
+                    $StoresList.append($item);
+                }
+            });
+        }
+    });
+</script>
+<script>
+    /**
+     * 搜索门店
+     */
+    function SearchStore($StoresList) {
+        var timeout;
+        $('#search-store').on('input propertychange', function () {
+            var $this = $(this);
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                DelaySearch($StoresList, $this.val());
+            }, storeSearchDuration);
+        });
+    }
+    function DelaySearch($StoresList, search) {
+        if (search) {
+            var $find = $StoresList.find('tr').hide().filter(function () {
+                var $this = $(this);
+                return $this.find('td:eq(0)').text().indexOf(search) >= 0 ||
+                        $this.attr('data-number').indexOf(search) >= 0 ||
+                        $this.attr('data-number1').indexOf(search) >= 0;
+            }).show();
+            console.log(search, $find);
+        } else {
+            $StoresList.find('tr').show();
+        }
+    }
+</script>
+<script>
+    /**
+     * 格式化输入的时间
+     */
+    $(function () {
+        var timeout;
+        $('body').on('input propertychange', 'input.date', function () {
+            var $this = $(this);
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                var val = $this.val(), time = moment(val, 'YYYY MM DD-HH:mm:ss');
+                if (!time.isValid())
+                    return;
+                $this.val(time.format('YYYY MM DD-HH:mm:ss'));
+            }, formatTimeDuration);
+        })
+    });
+</script>
+<script>
+    /**
+     * 选择经理
+     * 处理任职记录
+     */
+    $(function () {
+        var $addManagerWorkTime = $('.add-manager-work-time');
+        var $submit = $addManagerWorkTime.find('.manager-submit'), $cancel = $addManagerWorkTime.find('.manager-cancel');
+        var $select = $addManagerWorkTime.find('.manager-select'), $name = $addManagerWorkTime.find('.manager-name');
+        var $start = $addManagerWorkTime.find('input[name="start"]'), $end = $addManagerWorkTime.find('input[name="end"]');
+        var $ManagerId = $addManagerWorkTime.find('input[name="ManagerId"]'), $StoreId = $addManagerWorkTime.find('input[name="StoreId"]');
+        var $ManagersList = $('.managers tbody');
+
+        /**
+         * 删除任职记录
+         */
+        $ManagersList.on('click', '.delete-work', function () {
+            var $tr = $(this).closest('tr'), id = $tr.attr('data-worktime-id');
+            if (!window.confirm('确定删除任职记录?\n'))
+                return;
+            $.get('work/delete/' + id, function (data) {
+                if (data.error)
+                    return Toast(data.error);
+                $tr.remove();
+                Toast(data.success);
+            });
+        });
+
+        /**
+         * 修改任职记录
+         */
+        $ManagersList.on('click', '.edit-work', function () {
+            var $tr = $(this).closest('tr');
+            var data = {
+                id: $tr.attr('data-worktime-id'),
+                start: $tr.find('input[name="start"]').val(),
+                end: $tr.find('input[name="end"]').val(),
+            };
+            console.log(data);
+            $.post('work/edit', data, function (data) {
+                Toast(data.success || data.error);
+            });
+        });
+
+        /**
+         * 根据门店ID读取任职记录列表
+         * @param storeId
+         */
+        window.LoadWorkTime = function (storeId) {
+            $ManagersList.empty();
+            $.get('store/' + storeId, function (data) {
+                if (data.error)
+                    return Toast(data.error);
+                if (data.success.length == 0) {
+                    $ManagersList.append(emptyItem);
+                    return;
+                }
+                for (var i in data.success) {
+                    var work = data.success[i];
+                    AddWorkTime(work['Manager.id'], work['Manager.name'], work.id, work.start, work.end);
+                }
+            });
+        };
+
+
+        /**
+         * 增加数据到列表
+         * @param managerId
+         * @param managerName
+         * @param workId
+         * @param start
+         * @param end
+         */
+        window.AddWorkTime = function (managerId, managerName, workId, start, end) {
+            var $item = $(managerItem);
+            $item.attr({
+                'data-manager-id': managerId,
+                'data-worktime-id': workId
+            });
+            $item.find('td:eq(0)').text(managerName);
+            $item.find('input:eq(0)').val(moment(start).format('YYYY MM DD-HH:mm:ss'));
+            $item.find('input:eq(1)').val(moment(end).format('YYYY MM DD-HH:mm:ss'));
+            $ManagersList.append($item);
+        };
+
+        /**
+         * 复位任职记录的表单
+         */
+        window.ResetWorkTime = function () {
+            $select.show();
+            $name.hide().text('');
+            $start.val('');
+            $end.val('');
+            $ManagerId.val('');
+        };
+
+        /**
+         * 添加新的任职记录
+         */
+        $submit.click(function () {
+            $.post('work/add', {
+                ManagerId: $ManagerId.val(),
+                StoreId: $StoreId.val(),
+                start: $start.val(),
+                end: $end.val()
+            }, function (data) {
+                if (data.error)
+                    return Toast(data.error);
+                data = data.success;
+                AddWorkTime(data.ManagerId, $name.text(), data.id, data.start, data.end);
+                ResetWorkTime();//复位
+                Toast('成功添加新的任职记录');
+            });
+        });
+        $cancel.click(ResetWorkTime);
+        $select.click(function () {
+            var window = showWindow(), timeout;
+            var $window = window.show('选择 / 添加 经理', selectManager), $tbody = $window.find('tbody');
+            $window.find('.window-search-manager').on('input propertychange', function () {
+                var val = $(this).val();
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    if (!val) {
+                        return;
+                    }
+                    $.get('manager/search/' + val, function (data) {
+                        $tbody.find('.cursor').remove();
+                        if (data.error)
+                            return Toast(data.error);
+                        if (data.success.length == 0) {
+                            return $tbody.append(emptyItem);
+                        }
+                        for (var i in data.success) {
+                            var $item = $(selectItem), m = data.success[i];
+                            $item
+                                    .attr({'data-manager-id': m.id})
+                                    .find('td:eq(0)').text(m.name)
+                                    .end()
+                                    .find('td:eq(1)')
+                                    .html(m.store);
+                            $tbody.append($item);
+                        }
+                    });
+                }, managersSearchDuration);
+            });
+            //点击tr选择经理
+            $tbody.unbind().on('click', 'tr.cursor', function () {
+                var $this = $(this);
+                SelectManager($this.attr('data-manager-id'), $this.find('td:eq(0)').text());
+                window.hide();
+            });
+            //添加新的经理
+            $window.find('.manager-add').click(function () {
+                $.post('manager/add', {name: $(this).siblings('input').val()}, function (data) {
+                    if (data.error)
+                        return Toast(data.error);
+                    SelectManager(data.success.id, data.success.name);
+                    window.hide();
+                    Toast('成功添加新的经理,并已经选择');
+                });
+            });
+        });
+
+        function SelectManager(id, name) {
+            $name.text(name).show();
+            $ManagerId.val(id);
+            $select.hide();
+        }
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<style>
+    .stores .mdl-card__title {
+        box-sizing: content-box;
+        display: block;
+    }
+
+    .store-window {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    .store-window .bg {
+        position: absolute;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+    }
+
+    .store-window .mdl-card {
+        position: relative;
+        z-index: 20;
+        margin: 20px auto 0;
+    }
+</style>
+<div class="stores mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">门店信息管理</h2>
+    </div>
+    <table class="mdl-card__supporting-text mdl-data-table mdl-js-data-table">
+        <thead>
+        <tr>
+            <th class="mdl-data-table__cell--non-numeric">编号</th>
+            <th class="mdl-data-table__cell--non-numeric">门店</th>
+            <th class="mdl-data-table__cell--non-numeric">
+                <button class="addNew mdl-button mdl-js-button mdl-button--icon mdl-button--colored">
+                    <i class="material-icons">add</i>
+                </button>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="mdl-card__menu" style="font-size: 12px;">
+        使用Ctrl+F搜索
+    </div>
+</div>
+<script>
+    $(function () {
+        var $addUser = $('.stores tbody');
+        var $item = $('<tr>\
+                <td class="number mdl-data-table__cell--non-numeric"></td>\
+                <td class="name mdl-data-table__cell--non-numeric"></td>\
+                <td>\
+                    <button class="edit mdl-button mdl-js-button mdl-button--icon mdl-button--colored"><i class="material-icons">edit</i></button>\
+                    <button class="delete mdl-button mdl-js-button mdl-button--icon mdl-button--colored"><i class="material-icons">delete_forever</i></button>\
+                </td>\
+                </tr>');
+        var $editHtml = $('<tr>\
+            <td>四位门店编号<input type="hidden" name="id"></td>\
+            <td class="mdl-data-table__cell--non-numeric">\
+            <input maxlength="4" name="number">\
+            <br>例如 1117<br>设定后就不能修改\
+            </td>\
+            </tr>\
+            <tr>\
+            <td>七位门店编号</td>\
+            <td class="mdl-data-table__cell--non-numeric">\
+            <input maxlength="7" name="number1">\
+            <br>例如 1400352<br>设定后就不能修改\
+            </td>\
+            </tr>\
+            <tr>\
+            <td>门店名称</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input name="name"></td>\
+            </tr>\
+            <!--<tr>\
+            <td>城市(拼音)</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input name="city"></td>\
+            </tr>\
+            <tr>\
+            <td>区域(中文)</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input name="district"></td>\
+            </tr>\
+            <tr>\
+            <td>Category</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input name="category"></td>\
+            </tr>-->\
+            <tr>\
+            <td>BU</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input name="bu"></td>\
+            </tr>\
+            <tr>\
+            <td>PC</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input name="pc"></td>\
+            </tr>\
+            <tr>\
+            <td>Patch</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input name="patch"></td>\
+            </tr>\
+            <tr>\
+            <td>有麦咖啡?</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input type="checkbox" name="cafe"></td>\
+            </tr>\
+            <tr>\
+            <td>有甜品区?</td>\
+            <td class="mdl-data-table__cell--non-numeric"><input type="checkbox" name="kiosk"></td>\
+            </tr>');
+
+
+        //新增门店
+        $('.stores .addNew').click(function () {
+            var $new = $editHtml.clone(), window = showWindow();
+            window.show('添加门店', $new, function (data) {
+                window.disable();
+                $.post('store/add', data, function (data) {
+                    if (data.error)
+                        return Toast(data.error);
+                    Toast('添加成功');
+                    show(data.success);
+                    window.hide();
+                });
+            });
+        });
+
+        //删除门店
+        $('.stores')
+                .on('click', '.delete', function () {
+                    var $this = $(this), id = $this.attr('store-id'), $tr = $this.closest('tr');
+                    var s = "确认删除:\n" + $tr.find('.number').text() + "\n" + $tr.find('.name').text();
+                    if (!confirm(s))
+                        return;
+                    $.get('store/delete/' + id, function (data) {
+                        Toast(data.success || data.error);
+                        if (data.success) {
+                            $this.closest('tr').remove();
+                        }
+                    });
+                })
+                .on('click', '.edit', function () {
+                    var id = $(this).attr('store-id'), $clone = $editHtml.clone(), $name = $(this).closest('tr').find('.name');
+                    //禁止修改编号
+                    $clone.find('input[name="number"]').attr('disabled', 'disabled');
+                    var window = showWindow();
+                    $.get('store/' + id, function (data) {
+                        if (data.success) {
+                            window.show('修改: ' + data.success.name, $clone, function (data) {
+                                $.post('store/edit', data, function (data) {
+                                    if (data.success)
+                                        $name.text($clone.find('input[name="name"]').val());
+                                    Toast(data.success || data.error);
+                                });
+                            });
+                            for (var i in data.success) {
+                                if (i == 'kiosk' || i == 'cafe') {
+                                    if (data.success[i])
+                                        $clone.find('input[name="' + i + '"]').attr('checked', 'checked');
+                                    else
+                                        $clone.find('input[name="' + i + '"]').removeAttr('checked');
+                                    continue;
+                                }
+                                $clone.find('input[name="' + i + '"]').val(data.success[i]);
+                            }
+                            return;
+                        }
+                        window.hide();
+                        Toast(data.error);
+                    });
+                });
+
+        function show(store) {
+            var $new = $item.clone();
+            $new.find('.number').text(store.number);
+            $new.find('.name').text(store.name);
+            $new.find('button').attr('store-id', store.id);
+            $addUser.after($new);
+        }
+
+        function LoadUser() {
+            $addUser.empty();
+            $.get('store/all', function (data) {
+                data = data.success;
+                for (var i in data) {
+                    show(data[i]);
+                }
+            })
+        }
+
+        LoadUser();
+    });
+</script>

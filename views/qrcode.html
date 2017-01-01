@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>获取麦当劳门店二维码</title>
+    <% include viewport %>
+    <% include mdl %>
+    <style>
+        body {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .window {
+
+        }
+
+        .qrcode {
+            display: none;
+        }
+
+        .qrcode_container {
+            margin-top: 10px;
+        }
+
+        .qrcode_container * {
+            width: 100%;
+        }
+    </style>
+    <script src="/public/jquery.qrcode.min.js"></script>
+</head>
+<body>
+<form class="window mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">获取门店二维码</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input minlength="4" maxlength="4" class="mdl-textfield__input" type="text" id="storeNumber"
+                   pattern="-?[0-9]*(\.[0-9]+)?"
+                   name="store_number">
+            <label class="mdl-textfield__label" for="storeNumber">输入四位门店编号</label>
+            <span class="mdl-textfield__error">输入的内容不符合预期要求</span>
+        </div>
+        <div class="qrcode">
+            <div class="name">店名:<span></span></div>
+            <div class="link">分店投票链接:<span></span></div>
+            <div class="number">编号:<span></span></div>
+            <div class="qrcode_container"></div>
+        </div>
+    </div>
+    <div class="mdl-card__actions mdl-card--border" style="text-align: center;">
+        <!-- Accent-colored raised button with ripple -->
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="submit">
+            查询
+        </button>
+    </div>
+</form>
+<% include toast %>
+<script>
+    var duration = 500;
+    var img = new Image();
+    img.src = "/public/qrcode_logo.png";
+    $(function () {
+        var $qrcode = $('.qrcode'), $qrcodeContainer = $('.qrcode_container'), $number = $('#storeNumber');
+        $('.window').submit(function () {
+            $qrcode.stop(true).fadeOut(duration);
+            $.getJSON('/qrcode/' + $number.val(), function (data) {
+                if (data.success) {
+                    data = data.success;
+                    $('.name span').text(data.name);
+                    $('.link span').html('<a href="' + data.link + '">' + data.link + '</a>');
+                    $('.number span').text(data.number);
+                    showQrCode(data.link);
+                    $qrcode.stop(true).fadeIn(duration);
+                    return;
+                }
+                Toast(data.error);
+            });
+            return false;
+        });
+
+        function showQrCode(link) {
+            $qrcodeContainer.empty();
+            $qrcodeContainer.qrcode({width: 800, height: 800, text: link});
+            var c = $qrcodeContainer.find('canvas')[0];
+            var cxt = c.getContext("2d");
+            cxt.drawImage(img, 0, 0);
+        }
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+    <header class="demo-drawer-header">
+        <div class="demo-avatar-dropdown">
+            <i class="material-icons demo-avatar">account_box</i>
+            <span><%= user %></span>
+            <div class="mdl-layout-spacer"></div>
+            <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+                <i class="material-icons" role="presentation">arrow_drop_down</i>
+                <span class="visuallyhidden">Accounts</span>
+            </button>
+            <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
+                <li class="logout mdl-menu__item"><i class="material-icons">lock_outline</i>登出</li>
+            </ul>
+        </div>
+    </header>
+    <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+        <a class="mdl-navigation__link" href="/datacenter/">
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>
+            首页
+        </a>
+        <a class="mdl-navigation__link" href="/datacenter/bu/">
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>
+            BU
+        </a>
+        <a class="mdl-navigation__link" href="/datacenter/pc/">
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>
+            PC
+        </a>
+        <a class="mdl-navigation__link" href="/datacenter/patch/">
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>
+            Patch
+        </a>
+        <a class="mdl-navigation__link" href="/datacenter/store/">
+            <i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">pin_drop</i>
+            门店
+        </a>
+        <!--<a class="mdl-navigation__link" href="/datacenter/manager/">
+            <i class="mdl-color-text&#45;&#45;blue-grey-400 material-icons" role="presentation">folder_shared</i>
+            经理
+        </a>-->
+    </nav>
+</div>
+<script>
+    $(function () {
+        $('.logout').click(function () {
+            $.get('/datacenter/logout', function (data) {
+                if (data.success)
+                    window.location.reload();
+                Toast(data.error);
+            });
+        });
+    });
+</script>

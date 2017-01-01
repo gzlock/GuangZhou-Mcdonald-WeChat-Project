@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <% include ../viewport %>
+    <title>服务先蜂 您赞为尊</title>
+    <link href="/public/vote.css" rel="stylesheet" type="text/css"/>
+    <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <!--<!% include wechat.html %!>-->
+</head>
+<body class="bg">
+<div class="header">
+    <img src="/public/new/top-logo.png">
+</div>
+<div class="page index-page">
+    <div class="index-logo center" style="left:-100%;">
+        <img src="/public/new/index-logo.png">
+    </div>
+    <div class="index-people center relative">
+        <img src="/public/new/index-peoples.png">
+    </div>
+    <div class="index-click click-animation relative" style="left:-100%;">
+        <div class="float"><img src="/public/new/click.png"></div>
+        <div class="button"><img src="/public/new/hanbao.png"></div>
+    </div>
+    <div class="index-tip">
+        为聆听顾客心声，优化餐厅服务，<br>本餐厅开展“服务先蜂，您赞为尊”顾客点赞活动。<br>
+        请根据您的真实感受为我们点赞<img src="/public/new/thumb1.png">吧，<br>
+        完成本次点赞活动即可领取麦当劳最新优惠券。<br>
+        您的参与，让我们做得更好！
+        <!--为了给您提供更好的餐厅服务，优化餐厅服务，本餐厅开展“服务先蜂，您赞为尊”活动，请您根据对我们服务的实际感受点<img
+            src="/public/new/thumb1.png">吧，完成本次活动即可领取麦当劳最新优惠券。<br>您的评价，让我们做得更好！-->
+    </div>
+</div>
+
+
+<div class="page vote-page" style="display: none;">
+    <form>
+        <div class="vote-logo center">
+            <img src="/public/new/vote-logo.png">
+        </div>
+        <div class="vote">
+            <div class="vote-item">
+                <div class="vote-item-title">
+                    1.您对我们餐厅服务的满意程度是<span class="red">*</span>
+                    <input type="hidden" name="score" value="0">
+                </div>
+                <div class="vote-item-score vote-item-content">
+                    <div class="vote-item-score-tip">
+                        <span>很不满意</span>
+                        <span class="right">很满意</span>
+                    </div>
+                    <table class="vote-item-score-thumb center">
+                        <tr>
+                            <td><img src="/public/new/thumb.png"><img src="/public/new/thumb1.png"></td>
+                            <td><img src="/public/new/thumb.png"><img src="/public/new/thumb1.png"></td>
+                            <td><img src="/public/new/thumb.png"><img src="/public/new/thumb1.png"></td>
+                            <td><img src="/public/new/thumb.png"><img src="/public/new/thumb1.png"></td>
+                            <td><img src="/public/new/thumb.png"><img src="/public/new/thumb1.png"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="vote-item">
+                <div class="vote-item-title">2.您愿意为我们哪些员工点赞<span class="red">*</span><span class="blue">【多选题】</span>
+                </div>
+                <div class="vote-item-content vote-check vote-area">
+                    <div class="vote-area-item">
+                        <div class="vote-checkbox">
+                            <img src="/public/new/thumb.png">
+                            <img src="/public/new/thumb1.png">
+                        </div>
+                        <div class="vote-area-name">点餐收银区员工</div>
+                        <div><img class="vote-area-image" src="/public/new/1.jpg"></div>
+                        <input type="hidden" name="order" value="0">
+                    </div>
+                    <div class="vote-area-item">
+                        <div class="vote-checkbox">
+                            <img src="/public/new/thumb.png">
+                            <img src="/public/new/thumb1.png">
+                        </div>
+                        <div class="vote-area-name">大堂服务员工</div>
+                        <div><img class="vote-area-image" src="/public/new/3.jpg"></div>
+                        <input type="hidden" name="service" value="0">
+                    </div>
+                    <% if(cafe) {%>
+                    <div class="vote-area-item">
+                        <div class="vote-checkbox">
+                            <img src="/public/new/thumb.png">
+                            <img src="/public/new/thumb1.png">
+                        </div>
+                        <div class="vote-area-name">咖啡师</div>
+                        <div><img class="vote-area-image" src="/public/new/2.jpg"></div>
+                        <input type="hidden" name="cafe" value="0">
+                    </div>
+                    <% } %>
+                    <% if(kiosk) {%>
+                    <div class="vote-area-item">
+                        <div class="vote-checkbox">
+                            <img src="/public/new/thumb.png">
+                            <img src="/public/new/thumb1.png">
+                        </div>
+                        <div class="vote-area-name">甜品站员工</div>
+                        <div><img class="vote-area-image" src="/public/new/1.jpg"></div>
+                        <input type="hidden" name="kiosk" value="0">
+                    </div>
+                    <% } %>
+                    <div class="vote-area-item">
+                        <div class="vote-checkbox">
+                            <img src="/public/new/thumb.png">
+                            <img src="/public/new/thumb1.png">
+                        </div>
+                        <div class="vote-area-name">生产区员工(品质)</div>
+                        <div><img class="vote-area-image" src="/public/new/1.jpg"></div>
+                        <input type="hidden" name="production" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="click-animation">
+            <div class="float"><img src="/public/new/paper.jpg"></div>
+        </div>
+    </form>
+</div>
+
+
+<div class="page last-page" style="display: none;">
+    <form>
+        <div class="vote">
+            <div class="vote-item">
+                <div class="vote-item-title">3、您愿意为我们哪些餐厅经理<img class="abc" src="/public/new/4.jpg">点赞？<span
+                        class="blue">【多选题】</span></div>
+                <div class="vote-item-content vote-check">
+                    <% var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'] %>
+                    <% for(var i = 0; i < managers.length; i++) { %>
+                    <div class="last-vote">
+                        <div class="vote-checkbox">
+                            <img src="/public/new/thumb.png">
+                            <img src="/public/new/thumb1.png">
+                        </div>
+                        <span><%= letters[i] %>.<%= managers[i].name %></span>
+                        <input name="<%= managers[i].id %>" type="hidden" value="0">
+                    </div>
+                    <% } %>
+                    <% if(managers.length == 0){ %>
+                    <div>暂无经理数据</div>
+                    <% } %>
+                </div>
+            </div>
+            <div class="vote-item">
+                <div class="vote-item-title">4、除了以上评价外，您还有其他意见吗？</div>
+                <div class="vote-item-content">
+                    <textarea name="message"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="click-animation relative submit">
+            <div class="float"><img src="/public/new/submit.jpg"></div>
+            <div class="button"><img src="/public/new/hanbao.png"></div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        var $indexLogo = $('.index-logo'), $indexButton = $('.index-click');
+        var duration = 300, top = 10;
+        var $clickAnimation = $('.click-animation'),
+                $click = $clickAnimation.find('.float');
+
+        $indexLogo.animate({left: 0}, duration);
+        $indexButton.delay(150).animate({left: 0}, duration);
+
+        $click.each(function () {
+            move($(this));
+        });
+
+        function move($float) {
+            var _top = parseInt($float.css('top'));
+            if (_top == 0) {
+                _top = top;
+            } else {
+                _top = 0;
+            }
+            $float.animate({top: _top}, {
+                duration: duration, complete: function () {
+                    move($float)
+                }
+            });
+        }
+
+        $clickAnimation.click(function () {
+            var $this = $(this);
+            var $parent = $this.closest('.page');
+
+            if ($parent.is('.vote-page')) {
+                if ($parent.find('input[name="score"]').val() == 0) {
+                    return alert('请选择满意程度');
+                }
+                if ($parent.find('.vote-area input[value=1]').length == 0) {
+                    return alert('请给员工点赞');
+                }
+            }
+
+            var $nextPage = $parent.nextAll('.page:hidden:first');
+            if ($nextPage.length == 0)
+                return;
+            $parent.hide();
+            $nextPage.show();
+            $('body').removeClass('bg');
+        });
+    });
+</script>
+
+<script>
+    var posting = false;
+    $(function () {
+        $('.submit').click(function () {
+            if (posting)
+                return;
+            posting = true;
+            $
+                    .post({url: '', data: $('form').serialize()})
+                    .always(function (res) {
+                        posting = false;
+                        window.alert(res.error || res.success);
+                        if (window.location.href.indexOf('m.yingwin.cn') >= 0)
+                            window.location.href = 'http://mcdmember.etocrm.com/mcd_card.html';
+                    });
+        });
+
+        $('.vote-check > *').click(function () {
+            var $this = $(this);
+            $this.toggleClass('checked');
+            $this.find('input').val($this.is('.checked') ? 1 : 0);
+        });
+
+        var $scoreItem = $('.vote-item-score-thumb td');
+        $scoreItem.click(function () {
+            var $this = $(this);
+            $scoreItem.removeClass('checked');
+            $this.toggleClass('checked').prevAll('td').toggleClass('checked');
+            $('input[name="score"]').val($this.index() + 1);
+        });
+    });
+</script>
+</body>
+</html>

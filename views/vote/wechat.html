@@ -1,0 +1,24 @@
+<script src="//res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script>
+    (function () {
+        var weChatConfig = JSON.parse('<%-weChat%>');
+        var config = {
+            title: '服务先蜂 您赞为尊',
+            link: window.location.href.split('?')[0],
+            desc: '完成本次点赞活动即可领取麦当劳最新优惠券。',
+            imgUrl: 'http://' + window.location.host + '/public/share.jpg',
+        };
+        wx.config(weChatConfig);
+        wx.ready(function () {
+            console.log('微信config成功');
+            wx.onMenuShareTimeline(config);
+            wx.onMenuShareAppMessage(config);
+            wx.onMenuShareQQ(config);
+            wx.onMenuShareWeibo(config);
+            wx.onMenuShareQZone(config);
+        });
+        wx.error(function (err) {
+            console.log('微信config失败', err);
+        })
+    })();
+</script>

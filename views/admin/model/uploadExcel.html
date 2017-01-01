@@ -1,0 +1,152 @@
+<link rel="stylesheet" type="text/css" href="/public/upload/webuploader.css">
+<script type="text/javascript" src="/public/upload/webuploader.js"></script>
+<style>
+</style>
+<div class="upload mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title mdl-card--border">
+        <h2 class="mdl-card__title-text">上传Excel数据表</h2>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <div>请确保上传的文件已清理干净<br>请不要有无关的内容存在</div>
+        <hr/>
+        <button class="show-upload-stores mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+            上传 门店 数据xlsx
+        </button>
+        <div style="height: 10px;"></div>
+        <button class="show-upload-managers mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+            上传 经理 数据xlsx
+        </button>
+    </div>
+</div>
+<script>
+    $(function () {
+        var uploadStoresFile = '<tr class="file"><td></td><td><div id="upload-file">选择文件</div><input type="hidden" name="path"></td></tr>\
+        <tr><td colspan="2">以下内容请填入对应的Excel表数据<span class="red">在第几列,从第1列算起</span><br>带星号的是很重要的数据,请复核多次确认</td></tr>\
+                <tr><td>四位编号 *</td><td><input name="number" type="number"></td></tr>\
+                <tr><td>七位编号 *</td><td><input name="number1" type="number"></td></tr>\
+                <tr><td>门店名 *</td><td><input name="name" type="number"></td></tr>\
+                <tr><td>Kiosk(甜品站) *</td><td><input name="kiosk" type="number"></td></tr>\
+                <tr><td>McCafe(麦咖啡) *</td><td><input name="cafe" type="number"></td></tr>\
+                <tr><td>DO或BU *</td><td><input name="bu" type="number"></td></tr>\
+                <tr><td>PC *</td><td><input name="pc" type="number"></td></tr>\
+                <tr><td>Patch *</td><td><input name="patch" type="number"></td></tr>\
+                <!--<tr><td>城市(拼音那列)</td><td><input name="city" type="number"></td></tr>\
+                <tr><td>区域(中文那列)</td><td><input name="district" type="number"></td></tr>\
+                <tr><td>24HR</td><td><input name="hr24" type="number"></td></tr>\
+                <tr><td>DT</td><td><input name="dt" type="number"></td></tr>\
+                <tr><td>MDS</td><td><input name="mds" type="number"></td></tr>\
+                <tr><td>CYT</td><td><input name="cyt" type="number"></td></tr>\
+                <tr><td>DPS</td><td><input name="dps" type="number"></td></tr>\
+                <tr><td>SOK</td><td><input name="sok" type="number"></td></tr>\
+                <tr><td>Category</td><td><input name="category" type="number"></td></tr>-->\
+                ';
+
+        var uploadManagersFile = '<tr class="file"><td></td><td><div id="upload-file">选择文件</div><input type="hidden" name="path"></td></tr>\
+        <tr><td>此次上传的数据<br>属于几月份? *</td><td><input name="month" type="number"></td></tr>\
+        <tr><td>是否属于增量添加? *<div class="red">即上传的表是不完整的<br>需要完整复制上个月的数据<br>再进行添加或修改</div></td>\
+        <td><input name="incremental" type="checkbox"></td></tr>\
+        <tr><td colspan="2">以下内容请填入对应的Excel表数据<span class="red">在第几列,从第1列算起</span><br>带星号的是很重要的数据,请复核多次确认</td></tr>\
+        <tr><td>门店编号(四位或七位都可以) *</td><td><input name="number" type="number"></td></tr>\
+        <tr><td>经理名字 *</td><td><input name="name" type="number"></td></tr>';
+
+        $('.show-upload-stores').click(function () {
+            var window = showWindow(), upload, $fileState;
+            window.show('上传门店', uploadStoresFile, function (data) {
+                var ok = true;
+                $('.window input').each(function () {
+                    var $this = $(this);
+                    if (!$this.val()) {
+                        alert('缺少内容');
+                        ok = false;
+                        return false;
+                    }
+                });
+                if (!ok)
+                    return;
+                $.post('import-stores', data, function (data) {
+                    Toast(data.success || data.error);
+                });
+            });
+            $fileState = $('tr.file td:eq(0)');
+            upload = WebUploader.create({
+                // swf文件路径
+                swf: '/public/upload/Uploader.swf',
+
+                // 文件接收服务端。
+                server: '/admin/upload-file',
+
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#upload-file',
+                auto: true,
+                duplicate: true
+            });
+
+            upload.on('fileQueued', function (file) {
+                $fileState.text(file.name + ' 上传中');
+            });
+
+            upload.on('uploadAccept', function (obj, ret) {
+                if (ret.success) {
+                    $('input[name="path"]').val(ret.success);
+                    $('#upload-file').hide().find('div:eq(1)').remove();
+                    $fileState.html(obj.file.name + '<br>上传成功');
+                    upload.destroy();
+                    return;
+                }
+                $fileState.html(obj.file.name + "<br>" + (ret.error || '上传失败'));
+            });
+        });
+
+        $('.show-upload-managers').click(function () {
+            var window = showWindow(), upload, $fileState;
+            window.show('上传经理数据', uploadManagersFile, function (data) {
+                var ok = true;
+                $('.window input').each(function () {
+                    var $this = $(this);
+                    if ($this.attr('type') == 'checkbox')
+                        return true;
+                    if (!$this.val()) {
+                        alert('缺少内容');
+                        ok = false;
+                        return false;
+                    }
+                });
+                if (!ok)
+                    return;
+                $.post('import-managers', data, function (data) {
+                    Toast(data.success || data.error);
+                });
+            });
+            $fileState = $('tr.file td:eq(0)');
+            upload = WebUploader.create({
+                // swf文件路径
+                swf: '/public/upload/Uploader.swf',
+
+                // 文件接收服务端。
+                server: '/admin/upload-file',
+
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#upload-file',
+                auto: true,
+                duplicate: true
+            });
+
+            upload.on('fileQueued', function (file) {
+                $fileState.text(file.name + ' 上传中');
+            });
+
+            upload.on('uploadAccept', function (obj, ret) {
+                if (ret.success) {
+                    $('input[name="path"]').val(ret.success);
+                    $('#upload-file').hide().find('div:eq(1)').remove();
+                    $fileState.html(obj.file.name + '<br>上传成功');
+                    upload.destroy();
+                    return;
+                }
+                $fileState.html(obj.file.name + "<br>" + (ret.error || '上传失败'));
+            });
+        });
+    });
+</script>

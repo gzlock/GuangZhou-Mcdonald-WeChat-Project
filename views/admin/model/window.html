@@ -1,0 +1,120 @@
+<style>
+    .window {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .window .bg {
+        position: absolute;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+    }
+
+    .window .mdl-card {
+        position: relative;
+        z-index: 20;
+        width: auto;
+        margin: 5px auto 0;
+    }
+
+    .window .editor {
+    }
+
+    .window .loading {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+<div class="window" style="display: none;">
+    <div class="bg"></div>
+    <div class="loading mdl-card mdl-shadow--2dp" style="width: 100px;height:100px;">
+        <div class="mdl-spinner mdl-js-spinner is-active"></div>
+    </div>
+    <div class="editor mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title title">
+            <h2 class="mdl-card__title-text">title</h2>
+        </div>
+        <form>
+            <table class="mdl-card__supporting-text mdl-data-table mdl-js-data-table" style="width: 100%;">
+                <tbody>
+                </tbody>
+                <tfoot>
+                <tr class="button">
+                    <td colspan="2">
+                        <button class="mdl-button mdl-js-button mdl-js-ripple-effect close" type="button">
+                            <i class="material-icons">close</i>
+                        </button>
+                        <button class="submit mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+                            <i class="material-icons">done</i>
+                        </button>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+</div>
+<script>
+    $(function () {
+        var $window = $('.window'),
+                $form = $window.find('form'),
+                $loading = $window.find('.loading'),
+                $editor = $window.find('.editor'),
+                $content = $window.find('tbody'),
+                $submitButton = $window.find('.submit');
+        $window.find('.close').click(function () {
+            $window.hide();
+        });
+
+        /**
+         * 显示编辑器窗口
+         * @return {{show: show, hide: hide}}
+         */
+        window.showWindow = function () {
+            $loading.show();
+            $editor.hide();
+            $window.show();
+            return {
+                /**
+                 * 对window添加内容
+                 * @param title
+                 * @param html
+                 * @param whenSubmit
+                 */
+                show: function (title, html, whenSubmit) {
+                    $loading.hide();
+                    $editor.show();
+                    $window.find('.title').text(title);
+                    $content.empty().append(html);
+                    if (whenSubmit)
+                        $submitButton.show();
+                    else $submitButton.hide();
+                    $form.unbind().submit(function () {
+                        whenSubmit && whenSubmit($form.serializeArray());
+                        return false;
+                    });
+                    return $window;
+                }, hide: function () {
+                    $window.hide();
+                }, enable: function () {
+                    $submitButton.removeAttr('disabled');
+                }, disable: function () {
+                    $submitButton.attr('disabled', 'disabled');
+                }
+            }
+        }
+    });
+</script>

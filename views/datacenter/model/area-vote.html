@@ -1,0 +1,45 @@
+<div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">区域点赞率</h2>
+    </div>
+    <table class="area-vote mdl-data-table mdl-js-data-table mdl-card__supporting-text">
+        <thead>
+        <tr>
+            <th class="mdl-data-table__cell--non-numeric">区域</th>
+            <th>点赞率</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="order">
+            <td class="mdl-data-table__cell--non-numeric">点餐收银区员工</td>
+            <td>0</td>
+        </tr>
+        <tr class="service">
+            <td class="mdl-data-table__cell--non-numeric">大堂服务员工</td>
+            <td>0</td>
+        </tr>
+        <tr class="kiosk">
+            <td class="mdl-data-table__cell--non-numeric">甜品站员工</td>
+            <td>0</td>
+        </tr>
+        <tr class="cafe">
+            <td class="mdl-data-table__cell--non-numeric">咖啡师</td>
+            <td>0</td>
+        </tr>
+        <tr class="production">
+            <td class=" mdl-data-table__cell--non-numeric">生产区员工(品质)</td>
+            <td>0</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    window.AreaVote = function (vote) {
+        $('tr.production td:eq(1)').text(vote.production);
+        $('tr.cafe td:eq(1)').text(vote.cafe);
+        $('tr.service td:eq(1)').text(vote.service);
+        $('tr.order td:eq(1)').text(vote.order);
+        $('tr.kiosk td:eq(1)').text(vote.kiosk);
+        SortDesc($('.area-vote tbody tr'));
+    }
+</script>

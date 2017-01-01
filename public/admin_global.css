@@ -1,0 +1,15 @@
+body {
+    background-color: #999;
+}
+
+.red {
+    color: red;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+.center {
+    text-align: center;
+}

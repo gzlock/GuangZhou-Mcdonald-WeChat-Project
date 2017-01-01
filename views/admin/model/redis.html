@@ -1,0 +1,87 @@
+<div class="redis mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Redis情况</h2>
+        <button class="init-stores mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--colored">
+            清空缓存
+        </button>
+    </div>
+    <table class="mdl-card__supporting-text mdl-data-table mdl-data-table--selectable">
+        <thead>
+        <tr>
+            <th class="mdl-data-table__cell--non-numeric">名称</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">门店投票开关</td>
+            <td class="mdl-data-table__cell--non-numeric">
+                <label class="vote-switch mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
+                    <input type="checkbox" id="switch-1" class="mdl-switch__input">
+                    <span class="mdl-switch__label"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">数据库中的<br>门店总数</td>
+            <td class="mysql mdl-data-table__cell--non-numeric" colspan="2">0</td>
+        </tr>
+        <tr>
+            <td class="mdl-data-table__cell--non-numeric">内存中的<br>门店数</td>
+            <td class="day-views mdl-data-table__cell--non-numeric" colspan="2">0</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    $(function () {
+        var $redis = $('.redis'),
+                $mysql = $redis.find('.mysql'),
+                $dayViews = $redis.find('.day-views'),
+                $voteSwitch = $redis.find('.vote-switch');
+
+        $voteSwitch.on('change', function () {
+            var $this = $(this);
+            SetVoteSwitch($this.is('.is-checked'));
+        });
+
+
+        $redis.find('.init-stores').click(function () {
+            $.get('redis/init?' + Date.now(), function (data) {
+                $dayViews.text(0);
+                Toast(data.success);
+            });
+        });
+
+        function get() {
+            $.get('redis?' + Date.now(), function (data) {
+                setTimeout(get, 10000);
+                if (data.error)
+                    return Toast(data.error);
+                $mysql.text(data.success.mysql);
+                $dayViews.text(data.success.redis);
+                if (data.success.redis != data.success.mysql) {
+                    $dayViews.addClass('red');
+                } else
+                    $dayViews.removeClass('red');
+            });
+        }
+
+
+        function SetVoteSwitch(onOrOff) {
+            $.get('redis/vote-switch/' + onOrOff).always(function (data) {
+                Toast(data.error || data.success);
+            });
+        }
+
+        function GetVoteSwitch() {
+            $.get('redis/vote-switch').always(function (data) {
+                if (data.success == 1)
+                    $voteSwitch.find('input').attr('checked', 'checked').end()[0].MaterialSwitch.checkToggleState();
+            });
+        }
+
+        get();
+        GetVoteSwitch();
+    });
+</script>

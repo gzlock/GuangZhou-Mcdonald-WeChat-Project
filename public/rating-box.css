@@ -1,0 +1,123 @@
+
+.rating-box > div {
+    box-sizing: border-box;
+}
+
+.rating-box .score-container {
+    display: inline-block;
+    width: 35%;
+    padding: 20px;
+    text-align: center;
+}
+
+.rating-box .rating-histogram {
+    display: inline-block;
+    padding: 20px;
+    width: 60%;
+}
+
+.rating-box .rating-histogram .material-icons {
+    font-size: 12px;
+}
+
+.star-container {
+    text-align: left;
+    display: inline-block;
+}
+
+.star-container > div {
+    position: relative;
+    height: 30px;
+    overflow: hidden;
+}
+
+.star-container > div > div {
+    width: 140px;
+}
+
+.star-container .material-icons {
+}
+
+.star-container .background .material-icons {
+    color: #ddd;
+}
+
+.star-container .cover {
+    margin-top: -30px;
+}
+
+.rating-bar-container {
+    position: relative;
+}
+
+.rating-bar-container > div {
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.rating-bar-container .rating-star {
+    width: 10%;
+    position: relative;
+    top: -6px;
+    color: #999;
+}
+
+.rating-bar-container .color-bar {
+    position: relative;
+    width: 80%;
+    height: 24px;
+}
+
+.rating-bar-container > div {
+    display: inline-block;
+}
+
+.rating-bar-container .color-bar > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+}
+
+.rating-histogram .color-bar-number {
+    line-height: 24px;
+    text-indent: 4px;
+}
+
+.rating-histogram .five .color-bar-background {
+    background: #88b131;
+}
+
+.rating-histogram .four .color-bar-background {
+    background: #99cc00;
+}
+
+.rating-histogram .three .color-bar-background {
+    background: #ffcf02;
+}
+
+.rating-histogram .two .color-bar-background {
+    background: #ff9f02;
+}
+
+.rating-histogram .one .color-bar-background {
+    background: #ff6f31;
+}
+
+.date-selector div {
+    margin-top: 5px;
+    text-align: center;
+}
+
+.date-selector input {
+    text-align: center;
+    padding: 10px;
+    display: inline-block;
+    width: 30px;
+    border: solid 2px rgb(63, 81, 181);
+}
+
+.mdl-card-rating {
+    width: 100%;
+}

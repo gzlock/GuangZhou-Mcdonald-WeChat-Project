@@ -1,0 +1,85 @@
+<div class="show-vote">
+    <h5>最新投票
+        <button class="more-vote mdl-button mdl-js-button mdl-button--primary">
+            更多
+        </button>
+    </h5>
+    <table class="vote-table mdl-data-table mdl-js-data-table">
+        <thead>
+        <tr>
+            <th class="mdl-data-table__cell--non-numeric">IP</th>
+            <th class="mdl-data-table__cell--non-numeric">评分</th>
+            <th class="mdl-data-table__cell--non-numeric">留言</th>
+            <th class="mdl-data-table__cell--non-numeric">时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(function () {
+        var ShowVoteItem = '<tr>\
+                <td><div></div><div></div></td><td></td>\
+                <td class="show-vote-item-message mdl-data-table__cell--non-numeric"></td><td></td></tr>';
+        var voteContainer = '<table class="vote-table mdl-data-table mdl-js-data-table"><thead>' +
+                '<tr><td colspan="4">' +
+                '<button class="prev mdl-button mdl-js-button mdl-button--icon mdl-button--colored"><i class="material-icons">keyboard_arrow_left</i></button> 翻页 ' +
+                '<button class="next mdl-button mdl-js-button mdl-button--icon mdl-button--colored"><i class="material-icons">keyboard_arrow_right</i></button></td></tr>' +
+                '<tr><td>IP</td><td>评分</td><td class="mdl-data-table__cell--non-numeric">留言</td><td>时间</td></tr>' +
+                '</thead><tbody></tbody><tfoot></tfoot></table>';
+        var noData = '<tr><td colspan="4" style="text-align: center;">暂无内容</td></tr>';
+        var $tbody = $('.show-vote tbody');
+
+        $.get('vote', function (data) {
+            if (data.error || data.success.length == 0) {
+                return $tbody.append($(noData));
+            }
+            data = data.success;
+            ShowVote($tbody, ShowVoteItem, data);
+        });
+
+        $('.more-vote').click(function () {
+            Load(0);
+        });
+
+        function Load(page) {
+            $.get('vote/' + page, function (data) {
+                if (data.error || data.success.length == 0)
+                    return Toast('下一页没有内容了');
+
+                var $container = $(voteContainer), $prevPage = $container.find('.prev'), $nextPage = $container.find('.next');
+                if (page > 0) {
+                    $prevPage.removeAttr('disabled').click(function () {
+                        Load(page - 1)
+                    });
+                } else
+                    $prevPage.attr('disabled', 1);
+
+                $nextPage.click(function () {
+                    Load(page + 1);
+                });
+
+                data = data.success;
+                ShowVote($container, ShowVoteItem, data);
+
+                Alert('第' + (page + 1) + '页', $container);
+            });
+        }
+
+
+        function ShowVote($tbody, item, list) {
+            for (var i in list) {
+                var d = list[i];
+                var $item = $(item);
+                $item.find('td:eq(0) div:eq(0)').text(d.ip);
+                $item.find('td:eq(0) div:eq(1)').text(d.province + ' , ' + d.city);
+                $item.find('td:eq(1)').text(d.score);
+                $item.find('td:eq(2)').text(d.message);
+                $item.find('td:eq(3)').text(moment(d.createdAt).format('YYYY-MM-DD h:m:s'));
+                $tbody.append($item);
+            }
+        }
+    });
+</script>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+    <% include ../viewport %>
+    <% include ../mdl %>
+    <title>数据可视化中心 - 门店</title>
+    <link rel="stylesheet" href="/public/datacenter.css">
+</head>
+<body class="<%= store==null && 'no-data' %>">
+<% include model/alert.html %>
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+    <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+        <div class="mdl-layout__header-row">
+            <span class="store-name mdl-layout-title"><%= store? store.name:'门店' %></span>
+        </div>
+    </header>
+    <% include model/side_menu.html %>
+    <main class="mdl-layout__content mdl-color--grey-100">
+        <div class="mdl-grid demo-content">
+            <div class="no-data-tips mdl-grid mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+                <h3>请搜索门店</h3>
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input class="search-store mdl-textfield__input search" type="text" id="search">
+                    <label class="mdl-textfield__label" for="search">输入 门店名称 或 4位编号 </label>
+                </div>
+                <ul class="search-result mdl-list">
+                </ul>
+            </div>
+            <div class="demo-graphs mdl-cell mdl-cell--8-col">
+                <% include model/rating-box.html %>
+                <% if(store) { %>
+                <div class="demo-separator mdl-cell--1-col"></div>
+                <div class="mdl-card mdl-shadow--2dp">
+                    <div class="mdl-card__supporting-text">
+                        四位编号 : <span><%= store.number %></span><br>
+                        七位编号 : <span><%= store.number1 %></span><br>
+                        BU : <span class="cursor" data-bu="<%= store.bu %>"><%= store.bu %></span><br>
+                        PC : <span class="cursor" data-pc="<%= store.bu %>"><%= store.pc %></span><br>
+                        Patch : <span class="cursor" data-patch="<%= store.bu %>"><%= store.patch %></span><br>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+                <% include model/area-vote.html %>
+                <div class="demo-separator mdl-cell--1-col"></div>
+                <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
+                    <div class="mdl-card__title">
+                        <h2 class="mdl-card__title-text">经理点赞率</h2>
+                    </div>
+                    <table class="managers mdl-data-table mdl-js-data-table mdl-card__supporting-text">
+                        <thead>
+                        <tr>
+                            <th class="mdl-data-table__cell--non-numeric">姓名</th>
+                            <th>点赞率</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    $(function () {
+        var searchItem = '<li class="mdl-list__item cursor"><span class="mdl-list__item-primary-content"><i class="material-icons mdl-list__item-icon">location_on</i><span class="text"></span></span></li>';
+
+        var $body = $('body');
+
+        var $searchInput = $('.search-store');
+        var $searchList = $('.search-result');
+
+        var $managersTbody = $('.managers tbody');
+
+        $searchInput.on('input propertychange', function () {
+            var val = $.trim($searchInput.val());
+            if (val.length == 0) {//todo
+                return;
+            }
+            $.get('search/' + val, function (data) {
+                data = data.success;
+                if (data.length == 0) {
+                    $searchList.hide();
+                    return;
+                }
+                $searchList.empty().show();
+                for (var i in data) {
+                    var $item = $(searchItem);
+                    $item.attr('data-store-id', data[i].id).find('.text').html(data[i].name + '<br>编号:' + data[i].number);
+                    $searchList.append($item);
+                }
+            });
+        });
+
+        if (!$body.hasClass('no-data')) {
+            $('.today').trigger('click');
+        }
+
+        window.LoadDataHandle = function (data) {
+            var store = data.store;
+            $managersTbody.empty();
+            if (data.managers.length == 0) {
+                $managersTbody.append(emptyItem);
+            } else {
+                for (var i in data.managers) {
+                    var m = data.managers[i];
+                    var $item = $(listItem);
+                    $item.find('td:eq(0)').text(m.name);
+                    $item.find('td:eq(1)').text(m.votePercent);
+                    $managersTbody.append($item);
+                }
+//                SortDesc($managersTbody.find('tr'));
+            }
+
+            var $cafe = $('tr.cafe'), $kiosk = $('tr.kiosk');
+            if (store.cafe) {
+                $cafe.show();
+            } else
+                $cafe.hide();
+            if (store.kiosk) {
+                $kiosk.show();
+            } else
+                $kiosk.hide();
+        }
+    });
+</script>
+
+</body>
+</html>

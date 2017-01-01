@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+<head>
+    <% include ../viewport %>
+    <% include ../mdl %>
+    <title>数据可视化中心 - 首页</title>
+    <link rel="stylesheet" href="/public/datacenter.css">
+    <style>
+    </style>
+</head>
+<body>
+<% include model/alert.html %>
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+    <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">首页</span>
+            <div class="mdl-layout-spacer"></div>
+        </div>
+    </header>
+    <% include model/side_menu.html %>
+    <main class="mdl-layout__content mdl-color--grey-100">
+        <div class="mdl-grid demo-content">
+            <div class="demo-graphs mdl-cell mdl-cell--8-col">
+                <% include model/rating-box.html %>
+                <div class="top-list mdl-grid">
+                    <div class="views-top5 mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">门店浏览量 Top 5</h2>
+                        </div>
+                        <table class="views-top5 mdl-data-table mdl-js-data-table mdl-card__supporting-text">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">门店</th>
+                                <th>浏览量</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="scores-top5 mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">门店得分 Top 5</h2>
+                        </div>
+                        <table class="views-top5 mdl-data-table mdl-js-data-table mdl-card__supporting-text">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">门店</th>
+                                <th>得分</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="ratios-top5 mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">门店点评率 Top 5</h2>
+                        </div>
+                        <table class="views-top5 mdl-data-table mdl-js-data-table mdl-card__supporting-text">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">门店</th>
+                                <th>点评率</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="managers-top5 mdl-card mdl-shadow--2dp mdl-cell mdl-cell--6-col mdl-cell--4-col-tablet">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">经理点赞率 Top 5</h2>
+                        </div>
+                        <table class="views-top5 mdl-data-table mdl-js-data-table mdl-card__supporting-text">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">经理</th>
+                                <th>点评率</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+                <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
+                    <div class="mdl-card__title">
+                        <h2 class="mdl-card__title-text">公告</h2>
+                    </div>
+                    <div class="mdl-card__supporting-text" style="line-height: 24px;">
+                        <div class="green">全面优化,所有操作等待时间不超过3秒</div>
+                    </div>
+                </div>
+                <div class="demo-separator mdl-cell--1-col"></div>
+                <% include model/area-vote.html %>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    $(function () {
+        var top5Item = '<tr class="cursor">' +
+                '<td class="mdl-data-table__cell--non-numeric"><i class="material-icons"></i><span></span></td>' +
+                '<td>0</td></tr>';
+        var top5Empty = '<tr><td colspan="2" style="text-align: center">暂无数据</td></tr>';
+        var topItemIcon = ['looks_one', 'looks_two', 'looks_3', 'looks_4', 'looks_5'];
+        var $top5Views = $('.views-top5 tbody'),
+                $top5Scores = $('.scores-top5 tbody'),
+                $top5Ratios = $('.ratios-top5 tbody'),
+                $top5Managers = $('.managers-top5 tbody');
+
+        $('body').on('click', '[store-id]', function () {
+            OpenStore($(this).attr('store-id'));
+        });
+
+        window.LoadDataHandle = function (data) {
+            ShowTop5($top5Views, data.top.views, GetStoreId, function (data) {
+                return data.views;
+            });
+            ShowTop5($top5Scores, data.top.scores, GetStoreId, function (data) {
+                return parseInt(data.vote.score * data.vote.count);
+            });
+            ShowTop5($top5Ratios, data.top.ratios, GetStoreId, function (_d) {
+                return Percent(_d.vote.count, data.views);
+            });
+            ShowTop5($top5Managers, data.top.managers, function (data) {
+                return data.StoreId;
+            }, function (data) {
+                return data.votePercent;
+            });
+        };
+
+        function GetStoreId(item) {
+            return item.id;
+        }
+
+        function ShowTop5($tbody, list, idFunc, valueFunc) {
+            $tbody.empty();
+            if (Object.keys(list).length == 0)
+                return $tbody.append(top5Empty);
+            for (var key in list) {
+                var $item = $(top5Item);
+                $item.attr('data-store-id', idFunc(list[key]));
+                $item.find('td:eq(0) span').text(list[key].name);
+                $item.find('td:eq(1)').text(valueFunc(list[key]));
+                $tbody.append($item);
+            }
+            $tbody.find('tr').each(function (i) {
+                $(this).find('i').text(topItemIcon[i]).addClass('top' + i);
+            });
+        }
+
+        $('.today').trigger('click');
+
+        function OpenStore(id) {
+            window.location.href = '/datacenter/store/' + id + '/';
+        }
+    });
+</script>
+</body>
+</html>

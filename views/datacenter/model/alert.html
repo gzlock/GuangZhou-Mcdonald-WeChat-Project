@@ -1,0 +1,72 @@
+<style>
+    .alert {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .alert .bg {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+    }
+
+    .alert .mdl-card {
+        position: relative;
+        z-index: 20;
+        width: auto;
+        margin: 5px auto 0;
+        min-width: 200px;
+    }
+
+    .alert .mdl-card__title {
+        /*height: 100px;*/
+    }
+</style>
+<div class="alert" style="display: none;">
+    <div class="bg"></div>
+    <div class="mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">title</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+        </div>
+        <div class="mdl-card__menu">
+            <button class="close mdl-button mdl-js-button mdl-button--icon mdl-button--colored">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var $alert = $('.alert'),
+                $title = $alert.find('.mdl-card__title-text'),
+                $content = $alert.find('.mdl-card__supporting-text'),
+                $close = $alert.find('.close');
+        $close.click(function () {
+            $alert.hide()
+        });
+        /**
+         *
+         * @param title
+         * @param content
+         * @return {JQuery|jQuery|HTMLElement}
+         */
+        window.Alert = function (title, content) {
+            $title.text(title);
+            $content.empty().append(content);
+            $alert.show();
+            return $alert;
+        }
+    });
+</script>

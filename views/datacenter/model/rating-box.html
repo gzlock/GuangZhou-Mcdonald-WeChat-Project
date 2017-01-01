@@ -1,0 +1,290 @@
+<% include ../../toast.ejs %>
+<link rel="stylesheet" href="/public/rating-box.css">
+<div class="mdl-card-rating mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+        <button class="today mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+            今天
+        </button>
+        <button class="this-week mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+            本周
+        </button>
+        <button class="this-month mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+            本月
+        </button>
+        <button class="select-date mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+            <i class="material-icons">date_range</i> <span class="show-select-date">选择日期</span>
+        </button>
+    </div>
+    <div class="mdl-card__supporting-text rating-box">
+        <h5 class="vertical-align">
+            <i class="material-icons">supervisor_account</i> 访问人数 <span class="views">0</span>
+        </h5>
+        <div class="score-container">
+            <h2 class="averageScore">0 分</h2>
+            <div class="star-container">
+                <div class="background">
+                    <div>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                    </div>
+                </div>
+                <div class="cover">
+                    <div>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                        <i class="material-icons">star</i>
+                    </div>
+                </div>
+            </div>
+            <div>共 <span class="vote-count">0</span> 条评价</div>
+        </div>
+        <div class="rating-histogram">
+            <div class="rating-bar-container five">
+                <div class="rating-star">5 <i class="material-icons">star</i></div>
+                <div class="color-bar">
+                    <div class="color-bar-background"></div>
+                    <div class="color-bar-number">0</div>
+                </div>
+            </div>
+            <div class="rating-bar-container four">
+                <div class="rating-star">4 <i class="material-icons">star</i></div>
+                <div class="color-bar">
+                    <div class="color-bar-background"></div>
+                    <div class="color-bar-number">0</div>
+                </div>
+            </div>
+            <div class="rating-bar-container three">
+                <div class="rating-star">3 <i class="material-icons">star</i></div>
+                <div class="color-bar">
+                    <div class="color-bar-background"></div>
+                    <div class="color-bar-number">0</div>
+                </div>
+            </div>
+            <div class="rating-bar-container two">
+                <div class="rating-star">2 <i class="material-icons">star</i></div>
+                <div class="color-bar">
+                    <div class="color-bar-background"></div>
+                    <div class="color-bar-number">0</div>
+                </div>
+            </div>
+            <div class="rating-bar-container one">
+                <div class="rating-star">1 <i class="material-icons">star</i></div>
+                <div class="color-bar">
+                    <div class="color-bar-background"></div>
+                    <div class="color-bar-number">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mdl-card__menu">
+        <a class="download-excel mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+           target="_blank">
+            <i class="material-icons">file_download</i> Excel
+        </a>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var $body = $('body');
+        $body
+                .on('click', '[data-store-id]', function () {
+                    var id = $(this).attr('data-store-id');
+                    window.location.href = '/datacenter/store/' + id + '/';
+                })
+                .on('click', '[data-bu]', function () {
+                    var id = $(this).attr('data-bu');
+                    window.location.href = '/datacenter/bu/' + id + '/';
+                })
+                .on('click', '[data-pc]', function () {
+                    var id = $(this).attr('data-pc');
+                    window.location.href = '/datacenter/pc/' + id + '/';
+                })
+                .on('click', '[data-patch]', function () {
+                    var id = $(this).attr('data-patch');
+                    window.location.href = '/datacenter/patch/' + id + '/';
+                });
+    });
+</script>
+
+<script>
+    //其它页面有用到,不要删除
+    var listItem = '<tr><td class="mdl-data-table__cell--non-numeric"></td><td></td></tr>';
+    var emptyItem = '<tr><td colspan="2" style="text-align: center;">暂无数据</td></tr>';
+    $(function () {
+        var $scoreTypeCount = [$('.one'), $('.two'), $('.three'), $('.four'), $('.five')];
+        var $voteCount = $('.vote-count');
+        var $averageScore = $('.averageScore');
+        var $starCover = $('.star-container .cover');
+        var $views = $('.views');
+        var duration = 500;
+        var timeout = 60, _timeout, timeoutCount;
+
+        window.LoadDate = function (url, cb) {
+            _timeout = timeout;
+            window.clearTimeout(timeoutCount);
+            TC();
+            $voteCount.text('0');
+            $views.text('0');
+            $('div.color-bar-number').text('0');
+            $('div.color-bar-background').stop(true).animate({width: 0}, {duration: duration});
+            $starCover.stop(true).animate({width: 0}, {duration: duration});
+            url = 'data/' + url;
+            $
+                    .get({url: url, timeout: timeout * 1000,})
+                    .done(function (data) {
+                        if (data.error)
+                            return Toast(data.error);
+                        data = data.success;
+                        $views.text(data.views);
+                        var averageScore = data.vote.score;
+                        $averageScore.text(averageScore + ' 分');
+                        $voteCount.text(data.vote.count);
+
+                        for (var key in data.vote.scoreTypeCount) {
+                            var count = parseInt(data.vote.scoreTypeCount[key]);
+                            var $bg = $scoreTypeCount[key - 1].find('.color-bar-background');
+                            $scoreTypeCount[key - 1].find('.color-bar-number').text(count);
+                            if (data.vote.count > 0) {
+                                var percent;
+                                if (count == data.vote.count) percent = 100;
+                                else percent = Percent(count, data.vote.count);
+                                $bg.stop(true).animate({'width': percent}, {duration: duration});
+                            }
+                        }
+                        window.AreaVote && AreaVote(data.vote);
+                        window.ManagerVote && ManagerVote(data.top.managers);
+
+                        $starCover.stop(true).animate({width: averageScore / 5 * 100 + '%'}, {duration: duration});
+                        cb && cb(data);
+                    })
+                    .fail(function () {
+                        $averageScore.text('读取超时');
+                    })
+                    .always(function () {
+                        window.clearTimeout(timeoutCount);
+                    });
+        };
+        function TC() {
+            $averageScore.text('读取中' + _timeout);
+            _timeout--;
+            timeoutCount = window.setTimeout(TC, 1000);
+        }
+    });
+</script>
+
+<script>
+    $(function () {
+        var DateSelector = '<form class="date-selector">\
+                <div>2016 <input class="month" placeholder="必填"> 月 <input class="day" placeholder="选填"> 号 </div>\
+                <div class="center">到(选填)</div>\
+                <div>2016 <input class="month1" placeholder="选填"> 月 <input class="day1" placeholder="选填"> 号</div>\
+                <div class="center"><button class="mdl-button mdl-js-button mdl-button--primary"><i class="material-icons">done</i></button></div>\
+                </form>';
+        var currentInputMonth, currentInputDay, currentInputMonth1, currentInputDay1;
+        var $selectDate = $('.select-date');
+        var $today = $('.today');
+        var $thisWeek = $('.this-week');
+        var $thisMonth = $('.this-month');
+        var $downloadExcel = $('.download-excel');
+
+        var $alert;
+        $selectDate.click(function () {
+            var $a = $(DateSelector);
+            var $month = $a.find('.month'), $month1 = $a.find('.month1');
+            var $day = $a.find('.day'), $day1 = $a.find('.day1');
+            $a.submit(function () {
+                var month_ = $month.val(),
+                        day_ = $day.val() ? ('-' + $day.val()) : '',
+                        month1_ = $month1.val(),
+                        day1_ = $day1.val() ? ('-' + $day1.val()) : '';
+                var date = '2016-' + month_ + day_, date1 = '';
+
+                if (month1_)
+                    date1 = '2016-' + month1_ + day1_;
+
+                var dateText = date;
+                dateText += date1 ? (' / ' + date1) : '';
+                var dateUrl = date;
+                dateUrl += date1 ? ('/' + date1) : '';
+
+                $('.show-select-date').text(dateText);
+                SetDownLoadUrl(dateUrl);
+                LoadDate(dateUrl, window.LoadDataHandle);
+                $alert.hide();
+                return false;
+            });
+            $alert = Alert('选择日期', $a);
+        });
+        $today.click(function () {
+            var d = new Date();
+            d = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+
+            SetDownLoadUrl(d);
+            LoadDate(d, window.LoadDataHandle);
+        });
+        $thisMonth.click(function () {
+            var d = new Date();
+            d = d.getFullYear() + '-' + (d.getMonth() + 1);
+            SetDownLoadUrl(d);
+            LoadDate(d, window.LoadDataHandle);
+        });
+        $thisWeek.click(function () {
+            var start = moment().startOf('week'), end = moment().endOf('week');
+            var d = start.format('YYYY-MM-DD') + '/' + end.format('YYYY-MM-DD');
+            SetDownLoadUrl(d);
+            LoadDate(d, window.LoadDataHandle);
+        });
+        $thisMonth.parent().on('click', 'button', function () {
+            $(this).addClass('mdl-button--colored').siblings().removeClass('mdl-button--colored');
+        });
+        function SetDownLoadUrl(date) {
+            $downloadExcel.attr('href', 'down/' + date);
+        }
+    });
+
+    //递增
+    function asc(a, b) {
+        var a_ = parseInt($(a).find('td:eq(1)').text()), b_ = parseInt($(b).find('td:eq(1)').text());
+        return a_ > b_ ? 1 : -1;
+    }
+
+    //递减
+    function desc(a, b) {
+        var a_ = parseInt($(a).find('td:eq(1)').text()), b_ = parseInt($(b).find('td:eq(1)').text());
+        return a_ > b_ ? -1 : 1;
+    }
+
+    window.SortDesc = function ($elements) {
+        var $parent = $elements.parent();
+        var sortEle = $elements.sort(desc);
+        $parent.empty().append(sortEle);
+    };
+    /**
+     * 两数相除
+     * @param {number}a
+     * @param {number}b
+     * @return {int}
+     */
+    function Divide(a, b) {
+        if (a == 0 || b == 0)
+            return 0;
+        return parseFloat((a / b).toFixed(3));
+    }
+
+    /**
+     *
+     * @param a
+     * @param b
+     * @return {string}
+     */
+    function Percent(a, b) {
+        var c = Divide(a, b);
+        return ((c * 100).toFixed(1)) + "%";
+    }
+</script>

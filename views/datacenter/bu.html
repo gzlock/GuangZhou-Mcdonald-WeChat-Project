@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <% include ../viewport %>
+    <% include ../mdl %>
+    <title>数据可视化中心 - BU</title>
+    <link rel="stylesheet" href="/public/datacenter.css">
+</head>
+<body class="<%= bu ? '':'no-data' %>">
+<% include model/alert.html %>
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+    <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+        <div class="mdl-layout__header-row">
+            <span class="page-name mdl-layout-title">BU - <%= bu ? bu : 'bu'%></span>
+        </div>
+    </header>
+    <% include model/side_menu.html %>
+    <main class="mdl-layout__content mdl-color--grey-100">
+        <div class="mdl-grid demo-content">
+            <div class="no-data-tips mdl-grid mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">
+                <div class="select-bu">
+                    <h3>请选择BU</h3>
+                    <ul class="mdl-list">
+                        <% if(locals.bus) {%>
+                        <% for(var i =0;i < bus.length; i++) { %>
+                        <li class="mdl-list__item cursor" data-bu="<%= bus[i] %>"><span
+                                class="mdl-list__item-primary-content"><i
+                                class="material-icons mdl-list__item-icon">flag</i><span
+                                class="text"><%= bus[i] %></span></span></li>
+                        <% } %>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+            <div class="demo-graphs mdl-cell mdl-cell--8-col">
+                <% include model/rating-box.html %>
+                <div class="demo-separator mdl-cell--1-col"></div>
+                <% if (locals.pc && locals.patch) {%>
+                <div class="content-list mdl-grid mdl-card mdl-shadow--2dp">
+                    <table class="mdl-data-table mdl-js-data-table mdl-cell mdl-cell--3-col">
+                        <tbody>
+                        <tr>
+                            <td class="mdl-data-table__cell--non-numeric">PC</td>
+                        </tr>
+                        <% for(var i in pc) {%>
+                        <tr class="cursor" data-pc="<%=pc[i]%>">
+                            <td><%=pc[i]%></td>
+                        </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                    <table class="mdl-data-table mdl-js-data-table mdl-cell mdl-cell--3-col">
+                        <tbody>
+                        <tr>
+                            <td class="mdl-data-table__cell--non-numeric">Patch</td>
+                        </tr>
+                        <% for(var i in patch) {%>
+                        <tr class="cursor" data-patch="<%=patch[i]%>">
+                            <td><%=patch[i]%></td>
+                        </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <% } %>
+            </div>
+            <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+                <% include model/area-vote.html %>
+                <div class="demo-separator mdl-cell--1-col"></div>
+                <% include model/manager-vote.html %>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    $(function () {
+        var $body = $('body');
+
+        if (!$body.hasClass('no-data')) {
+            $('.today').trigger('click');
+        }
+    });
+</script>
+
+</body>
+</html>
