@@ -1,6 +1,6 @@
 # 广州麦当劳满意度微信调查项目
 
-
+- 2016年7月开始，2016年12月结束
 - **收到超过200万张投票**
 - 运行环境: https://github.com/gzlock/docker-node-mysql-server
 - 数据备份: McDonald_0821.sql.zip
